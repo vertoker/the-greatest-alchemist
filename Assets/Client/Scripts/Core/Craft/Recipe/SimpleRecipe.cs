@@ -6,7 +6,7 @@ using Core.Items;
 
 namespace Core.Craft.Recipe
 {
-    [CreateAssetMenu(fileName = "Recipes/Simple", menuName = "NewSimpleRecipe", order = 1)]
+    [CreateAssetMenu(menuName = "Recipes/Simple", fileName = "NewSimpleRecipe", order = 1)]
     public class SimpleRecipe : ScriptableObject
     {
         [SerializeField] private InvertoryItem _item1, _item2, _item3, _item4;
