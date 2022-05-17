@@ -10,6 +10,20 @@ namespace Core.Items
         public Item Item;
         public int Quantity;
 
+        public void Add(Item item, int quantity)
+        {
+            Item = item;
+            Quantity = quantity;
+        }
+        public void Remove()
+        {
+            Item = null;
+        }
+        public bool IsEmpty()
+        {
+            return Item == null;
+        }
+
         public bool FullAdd(ref int quantity)
         {
             if (Quantity == Item.Capacity)
@@ -26,6 +40,12 @@ namespace Core.Items
         }
         public bool FullRemove(ref int quantity)
         {
+            if (Quantity == quantity)
+            {
+                Quantity = 0;
+                quantity = 0;
+                return false;
+            }
             if (Quantity < quantity)
             {
                 quantity -= Quantity;

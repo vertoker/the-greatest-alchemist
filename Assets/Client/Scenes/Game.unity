@@ -537,7 +537,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1556326899}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.6705101
+  m_Size: 0.9066812
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -874,9 +874,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f842ca66ce9439640af915cfec55d4fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _items:
-  - Item: {fileID: 11400000, guid: d4bde95e374886a469067794dd06e699, type: 2}
-    Quantity: 0
+  _invertoryCapacity: 100
+  _items: []
   _controller: {fileID: 420463238}
 --- !u!1 &1031628133
 GameObject:

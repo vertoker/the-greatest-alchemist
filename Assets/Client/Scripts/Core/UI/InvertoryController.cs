@@ -19,7 +19,7 @@ namespace Core.UI
             _spawner = GetComponent<PoolSpawner>();
         }
 
-        public void UpdateUI(List<InvertoryItem> items)
+        public void UpdateUI(InvertoryItem[] items)
         {
 
         }

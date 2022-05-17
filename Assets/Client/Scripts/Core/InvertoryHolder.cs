@@ -13,60 +13,72 @@ namespace Core
 {
     public class InvertoryHolder : MonoBehaviour
     {
-        [SerializeField] private List<InvertoryItem> _items = new List<InvertoryItem>();
+        [SerializeField] private int _invertoryCapacity = 100;
+        [SerializeField] private InvertoryItem[] _items;
         [SerializeField] private InvertoryController _controller;
+
+        private void Awake()
+        {
+            _items = new InvertoryItem[_invertoryCapacity];
+        }
 
         public void Add(Item item, int quantity)
         {
-            for (int i = 0; i < _items.Count; i++)
-                if (_items[i].Item.ID == item.ID)
-                    if (_items[i].FullAdd(ref quantity))
-                        break;
+            for (int i = 0; i < _items.Length; i++)
+                if (!_items[i].IsEmpty())// Если есть предмет
+                    if (_items[i].Item.ID == item.ID)// Если он совпадает с тем предметом
+                        if (_items[i].FullAdd(ref quantity))// Добавляет количество к предмету
+                            break;// Если количество кончилось
 
-            if (quantity > 0)
+            if (quantity > 0)// Если количество не кончилось
             {
-                int whole = quantity / item.Capacity;
-                int remainder = quantity - whole * item.Capacity;
-                for (int i = 0; i < whole; i++)
-                    _items.Add(new InvertoryItem() { Item = item, Quantity = item.Capacity });
-                if (remainder > 0)
-                    _items.Add(new InvertoryItem() { Item = item, Quantity = remainder });
+                int whole = quantity / item.Capacity;// Сколько стаков надо добавить
+                int remainder = quantity - whole * item.Capacity;// Сколько в итоге останется
+                for (int i = 0; i < _items.Length; i++)
+                {
+                    if (_items[i].IsEmpty())// Если нету предмета
+                    {
+                        if (whole == 0)// Если кончились стаки
+                        {
+                            if (remainder > 0)
+                                _items[i].Add(item, remainder);
+                            break;
+                        }
+
+                        _items[i].Add(item, item.Capacity);
+                        whole--;
+                    }
+                }
             }
 
             _controller.UpdateUI(_items);
         }
-        public bool Remove(Item item, int quantity)//Must fix
+        public bool Remove(Item item, int quantity)
         {
             int capacityItemAll = 0;
-            for (int i = 0; i < _items.Count; i++)
+            List<int> allItemsID = new List<int>();
+            for (int i = 0; i < _items.Length; i++)
             {
-                if (_items[i].Item.ID == item.ID)
+                if (!_items[i].IsEmpty())// Если есть предмет
                 {
-                    capacityItemAll += _items[i].Quantity;
+                    if (_items[i].Item.ID == item.ID)// Если он совпадает с тем предметом
+                    {
+                        allItemsID.Add(i);
+                        capacityItemAll += _items[i].Quantity;
+                    }
                 }
             }
 
             if (quantity > capacityItemAll)
                 return false;
             
-            List<int> deleteItems = new List<int>();
-            for (int i = 0; i < _items.Count; i++)
+            for (int i = 0; i < allItemsID.Count; i++)
             {
-                if (_items[i].Item.ID == item.ID)
-                {
-                    if (_items[i].FullRemove(ref quantity))
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        deleteItems.Add(i);
-                    }
-                }
+                if (_items[allItemsID[i]].FullRemove(ref quantity))
+                    break;
+                else
+                    _items[allItemsID[i]].Remove();
             }
-
-            for (int i = deleteItems.Count - 1; i >= 0; i--)
-                _items.RemoveAt(deleteItems[i]);
 
             return true;
         }
