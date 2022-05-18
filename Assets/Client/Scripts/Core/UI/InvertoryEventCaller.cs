@@ -6,51 +6,68 @@ using UnityEngine;
 
 namespace Core.UI
 {
-    public class InvertoryEventCaller : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler
+    public class InvertoryEventCaller : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IPointerUpHandler
     {
-        [SerializeField] private float _timeToDisable = 0.3f;
         [SerializeField] private ScrollRect _scrollRect;
-        private Coroutine _disablerScrollRect;
+        private Vector2 _startPosition;
+        private bool _isSelect = false;
+        private bool _isDrag = false;
 
         [SerializeField] private InvertoryHolder _holder;
+        [SerializeField] private GraphicRaycaster _raycaster;
         private List<RaycastResult> _results;
-        private GraphicRaycaster _raycaster;
 
-        private void Awake()
+        public void OnPointerDown(PointerEventData eventData)
         {
-            _raycaster = GetComponent<GraphicRaycaster>();
-        }
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            if (_scrollRect.enabled)
-            {
-                _results = new List<RaycastResult>();
-                _raycaster.Raycast(eventData, _results);
-                if (_results[0].gameObject.TryGetComponent(out ItemSlot slot))
-                    slot.Click();
-            }
-            if (_disablerScrollRect != null)
-            {
-                StopCoroutine(_disablerScrollRect);
-                _scrollRect.enabled = true;
-            }
+            _startPosition = eventData.pointerCurrentRaycast.screenPosition;
         }
         public void OnBeginDrag(PointerEventData eventData)
         {
-            _disablerScrollRect = StartCoroutine(DisablerScrollRect());
+            _isDrag = true;
+            Vector2 offset = eventData.pointerCurrentRaycast.screenPosition - _startPosition;
+            if (Mathf.Abs(offset.y) > Mathf.Abs(offset.x))
+                return;
+
+            _isSelect = true;
+            _results = new List<RaycastResult>();
+            _raycaster.Raycast(eventData, _results);
+            if (_results.Count != 0)
+                if (_results[0].gameObject.TryGetComponent(out ItemSlot slot))
+                    slot.StartDrag();
+            _scrollRect.enabled = false;
         }
         public void OnDrag(PointerEventData eventData)
         {
+            if (!_scrollRect.enabled) 
+            {
+                _results = new List<RaycastResult>();
+                _raycaster.Raycast(eventData, _results);
+                if (_results.Count != 0)
+                    if (_results[0].gameObject.TryGetComponent(out ItemSlot slot))
+                        slot.AppendDrag();
+            }
+        }
+        public void OnPointerUp(PointerEventData eventData)
+        {
             _results = new List<RaycastResult>();
             _raycaster.Raycast(eventData, _results);
-            if (_results[0].gameObject.TryGetComponent(out ItemSlot slot))
-                print(_results[0].gameObject.name);
-        }
+            if (_results.Count != 0)
+            {
+                if (_results[0].gameObject.TryGetComponent(out ItemSlot slot))
+                {
+                    if (_isSelect)
+                        slot.FinishDrag();
+                    if (!_isDrag)
+                        slot.Click();
+                }
+            }
 
-        private IEnumerator DisablerScrollRect()
-        {
-            yield return new WaitForSeconds(_timeToDisable);
-            _scrollRect.enabled = false;
+            if (_isSelect)
+            {
+                _isSelect = false;
+                _scrollRect.enabled = true;
+            }
+            _isDrag = false;
         }
     }
 }

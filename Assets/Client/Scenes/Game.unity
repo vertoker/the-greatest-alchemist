@@ -762,6 +762,7 @@ GameObject:
   m_Component:
   - component: {fileID: 904113328}
   - component: {fileID: 904113332}
+  - component: {fileID: 904113333}
   - component: {fileID: 904113331}
   - component: {fileID: 904113330}
   - component: {fileID: 904113329}
@@ -811,10 +812,10 @@ MonoBehaviour:
   m_Horizontal: 0
   m_Vertical: 1
   m_MovementType: 1
-  m_Elasticity: 0.1
+  m_Elasticity: 0.15
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
+  m_ScrollSensitivity: 50
   m_Viewport: {fileID: 1617290127}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 576892470}
@@ -878,6 +879,22 @@ MonoBehaviour:
   _items: []
   _controller: {fileID: 420463238}
   _dataCapacity: {fileID: 11400000, guid: aa42290c3521b7046b515630d15ccfaf, type: 2}
+--- !u!114 &904113333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 904113327}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a0c6db9dbc18f9419b26b9bb13687fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _timeToDisable: 0.1
+  _scrollRect: {fileID: 904113329}
+  _holder: {fileID: 904113332}
+  _raycaster: {fileID: 1248173765}
 --- !u!1 &1031628133
 GameObject:
   m_ObjectHideFlags: 0
@@ -1034,7 +1051,6 @@ GameObject:
   - component: {fileID: 1248173766}
   - component: {fileID: 1248173765}
   - component: {fileID: 1248173769}
-  - component: {fileID: 1248173770}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1139,21 +1155,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _activeWindowIndex: 0
   _windows: []
---- !u!114 &1248173770
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1248173764}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a0c6db9dbc18f9419b26b9bb13687fe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _timeToDisable: 0.3
-  _scrollRect: {fileID: 904113329}
-  _holder: {fileID: 904113332}
 --- !u!1 &1392724275
 GameObject:
   m_ObjectHideFlags: 0

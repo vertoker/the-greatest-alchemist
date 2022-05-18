@@ -18,6 +18,9 @@ namespace Core
         [SerializeField] private InvertoryItem[] _items;
         [SerializeField] private InvertoryController _controller;
         [SerializeField] private PoolData _dataCapacity;
+        [Space]
+        [SerializeField] private List<int> _slotsSelected = new List<int>();
+        [SerializeField] private int _slotDragQuantity;
 
         private void Awake()
         {
@@ -26,7 +29,7 @@ namespace Core
         }
         private void Start()
         {
-            _controller.Init(Switch, Collect);
+            _controller.Init(Switch, Collect, AppendDrag, StartDrag, FinishDrag);
         }
 
         public void Add(Item item, int quantity, bool inStackable = true)
@@ -91,7 +94,6 @@ namespace Core
             _controller.UpdateUI(_items);
             return true;
         }
-
         public void Switch(int id1, int id2)
         {
             InvertoryItem temp = _items[id1];
@@ -100,7 +102,6 @@ namespace Core
 
             _controller.UpdateUI(_items);
         }
-
         public void Collect(int id)
         {
             if (_items[id] == null)
@@ -133,6 +134,49 @@ namespace Core
                 }
             }
 
+            _controller.UpdateUI(_items);
+        }
+
+        public void StartDrag(int id)
+        {
+            if (_items[id] == null)
+                return;
+            if (_items[id].IsEmpty())
+                return;
+            Item initItem = _items[id].Item;
+            _slotDragQuantity = _items[id].Quantity;
+            _slotsSelected.Add(id);
+            UpdateSlotsDrag(initItem);
+        }
+        public void AppendDrag(int id)
+        {
+            if (_slotsSelected.Count == 0)
+                return;
+
+            Item initItem = _items[_slotsSelected[0]].Item;
+
+            for (int i = 0; i < _slotsSelected.Count; i++)
+                if (_slotsSelected[i] == id || !_items[id].IsEmpty())// ≈сли слот повтор€етс€ или слот не пустой
+                    return;
+
+            _slotsSelected.Add(id);
+            UpdateSlotsDrag(initItem);
+        }
+        private void UpdateSlotsDrag(Item initItem)
+        {
+            int whole = _slotDragQuantity / _slotsSelected.Count;
+            int remainder = _slotDragQuantity - whole * _slotsSelected.Count;
+            for (int i = 0; i < _slotsSelected.Count; i++)
+                _items[_slotsSelected[i]].Add(initItem, whole);
+            _items[_slotsSelected[^1]].Quantity += remainder;
+
+            _controller.SelectDrag(_slotsSelected);
+            _controller.UpdateUI(_items);
+        }
+        public void FinishDrag()
+        {
+            _slotsSelected = new List<int>();
+            _controller.DeselectAll();
             _controller.UpdateUI(_items);
         }
     }

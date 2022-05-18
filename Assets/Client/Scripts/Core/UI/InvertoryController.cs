@@ -10,9 +10,10 @@ namespace Core.UI
 {
     public class InvertoryController : MonoBehaviour
     {
-        private ItemSlot[] slots;
+        private ItemSlot[] _slots;
         private RectTransform _transform;
         [SerializeField] private int _selected = -1;
+
         private UnityAction<int, int> _switchItems;
         private UnityAction<int> _collectItem;
 
@@ -21,23 +22,24 @@ namespace Core.UI
             _transform = GetComponent<RectTransform>();
         }
 
-        public void Init(UnityAction<int, int> switchItems, UnityAction<int> collectItem)
+        public void Init(UnityAction<int, int> switchItems, UnityAction<int> collectItem, UnityAction<int> append, UnityAction<int> start, UnityAction finish)
         {
             _switchItems = switchItems;
             _collectItem = collectItem;
-            slots = new ItemSlot[_transform.childCount];
+            _slots = new ItemSlot[_transform.childCount];
+            ItemSlot.Init(Click, append, start, finish);
             for (int i = 0; i < _transform.childCount; i++)
             {
                 var slot = _transform.GetChild(i).GetComponent<ItemSlot>();
-                slots[i] = slot;
-                slots[i].Init(i, Click);
+                _slots[i] = slot;
+                _slots[i].Init(i);
             }
         }
 
         public void UpdateUI(InvertoryItem[] items)
         {
             for (int i = 0; i < _transform.childCount; i++)
-                slots[i].UpdateItem(items[i]);
+                _slots[i].UpdateItem(items[i]);
         }
 
         public void Click(int id)
@@ -46,18 +48,29 @@ namespace Core.UI
             if (_selected == id)
             {
                 _selected = -1;
-                slots[id].Deselect();
+                _slots[id].Deselect();
                 _collectItem.Invoke(id);
                 return;
             }
             if (_selected == -1)
             {
                 _selected = id;
-                slots[id].Select();
+                _slots[id].Select();
                 return;
             }
-            slots[_selected].Deselect();
+            _slots[_selected].Deselect();
             _switchItems.Invoke(_selected, id);
+            _selected = -1;
+        }
+        public void SelectDrag(List<int> _slotsSelected)
+        {
+            foreach (var id in _slotsSelected)
+                _slots[id].Select();
+        }
+        public void DeselectAll()
+        {
+            foreach (var slot in _slots)
+                slot.Deselect();
             _selected = -1;
         }
     }
