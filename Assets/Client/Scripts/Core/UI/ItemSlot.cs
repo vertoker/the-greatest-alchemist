@@ -13,11 +13,13 @@ namespace Core.UI
     {
         private TMP_Text _capacity;
         private Image _item, _background;
-        private static UnityAction<int> _click;
-        private static UnityAction<int> _append;
-        private static UnityAction<int> _start;
-        private static UnityAction _finish;
+
         private int _id;
+        public int ID => _id;
+        public void SetID(int id)
+        {
+            _id = id;
+        }
 
         private void Awake()
         {
@@ -26,17 +28,6 @@ namespace Core.UI
             _capacity = transform.GetChild(2).GetComponent<TMP_Text>();
         }
 
-        public static void Init(UnityAction<int> click, UnityAction<int> append, UnityAction<int> start, UnityAction finish)
-        {
-            _click = click;
-            _append = append;
-            _finish = finish;
-            _start = start;
-        }
-        public void Init(int id)
-        {
-            _id = id;
-        }
         public void UpdateItem(InvertoryItem item)
         {
             if (item == null)
@@ -56,10 +47,6 @@ namespace Core.UI
             }
         }
 
-        public void Click()
-        {
-            _click.Invoke(_id);
-        }
         public void Select()
         {
             _background.color = Color.red;
@@ -67,22 +54,6 @@ namespace Core.UI
         public void Deselect()
         {
             _background.color = Color.white;
-        }
-
-        public void StartDrag()
-        {
-            print("StartDrag");
-            _start.Invoke(_id);
-        }
-        public void AppendDrag()
-        {
-            print("AppendDrag");
-            _append.Invoke(_id);
-        }
-        public void FinishDrag()
-        {
-            print("FinishDrag");
-            _finish.Invoke();
         }
     }
 }

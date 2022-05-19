@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine;
 
@@ -17,6 +18,18 @@ namespace Core.UI
         [SerializeField] private GraphicRaycaster _raycaster;
         private List<RaycastResult> _results;
 
+        private static UnityAction<int> _click;
+        private static UnityAction<int> _append;
+        private static UnityAction<int> _start;
+        private static UnityAction _finish;
+
+        public static void SetEvents(UnityAction<int> click, UnityAction<int> append, UnityAction<int> start, UnityAction finish)
+        {
+            _click = click;
+            _append = append;
+            _finish = finish;
+            _start = start;
+        }
         public void OnPointerDown(PointerEventData eventData)
         {
             _startPosition = eventData.pointerCurrentRaycast.screenPosition;
@@ -33,7 +46,7 @@ namespace Core.UI
             _raycaster.Raycast(eventData, _results);
             if (_results.Count != 0)
                 if (_results[0].gameObject.TryGetComponent(out ItemSlot slot))
-                    slot.StartDrag();
+                    _start.Invoke(slot.ID);
             _scrollRect.enabled = false;
         }
         public void OnDrag(PointerEventData eventData)
@@ -44,7 +57,7 @@ namespace Core.UI
                 _raycaster.Raycast(eventData, _results);
                 if (_results.Count != 0)
                     if (_results[0].gameObject.TryGetComponent(out ItemSlot slot))
-                        slot.AppendDrag();
+                        _append.Invoke(slot.ID);
             }
         }
         public void OnPointerUp(PointerEventData eventData)
@@ -56,9 +69,9 @@ namespace Core.UI
                 if (_results[0].gameObject.TryGetComponent(out ItemSlot slot))
                 {
                     if (_isSelect)
-                        slot.FinishDrag();
+                        _finish.Invoke();
                     if (!_isDrag)
-                        slot.Click();
+                        _click.Invoke(slot.ID);
                 }
             }
 
@@ -68,6 +81,18 @@ namespace Core.UI
                 _scrollRect.enabled = true;
             }
             _isDrag = false;
+        }
+
+        private void OnApplicationFocus(bool focus)
+        {
+            if (!focus)
+            {
+                _finish.Invoke();
+            }
+        }
+        private void OnApplicationQuit()
+        {
+            _finish.Invoke();
         }
     }
 }

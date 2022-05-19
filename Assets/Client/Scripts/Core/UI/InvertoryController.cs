@@ -26,14 +26,14 @@ namespace Core.UI
             {
                 var slot = _transform.GetChild(i).GetComponent<ItemSlot>();
                 _slots[i] = slot;
-                _slots[i].Init(i);
+                _slots[i].SetID(i);
             }
         }
         public void Init(UnityAction<int, int> switchItems, UnityAction<int> collectItem, UnityAction<int> append, UnityAction<int> start, UnityAction finish)
         {
             _switchItems = switchItems;
             _collectItem = collectItem;
-            ItemSlot.Init(Click, append, start, finish);
+            InvertoryEventCaller.SetEvents(Click, append, start, finish);
         }
 
         public void UpdateUI(InvertoryItem[] items)

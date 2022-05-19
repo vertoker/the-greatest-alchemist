@@ -140,6 +140,7 @@ namespace Core
             _controller.UpdateUI(_items);
         }
 
+        [Space(30)]
         [SerializeField] private List<int> _slotsSelected = new List<int>();
         [SerializeField] private Item _slotDragItem;
         [SerializeField] private int _slotDragQuantity;
