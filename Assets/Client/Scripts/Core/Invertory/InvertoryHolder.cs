@@ -8,9 +8,8 @@ using UnityEditor;
 
 using Game.Pool;
 using Core.Items;
-using Core.UI;
 
-namespace Core
+namespace Core.Invertory
 {
     public class InvertoryHolder : MonoBehaviour
     {

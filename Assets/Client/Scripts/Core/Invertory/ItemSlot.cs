@@ -7,7 +7,7 @@ using TMPro;
 
 using Core.Items;
 
-namespace Core.UI
+namespace Core.Invertory
 {
     public class ItemSlot : MonoBehaviour
     {

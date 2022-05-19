@@ -5,7 +5,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine;
 
-namespace Core.UI
+namespace Core.Invertory
 {
     public class InvertoryEventCaller : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IPointerUpHandler
     {

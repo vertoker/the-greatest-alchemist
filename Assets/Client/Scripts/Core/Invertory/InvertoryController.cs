@@ -6,7 +6,7 @@ using UnityEngine;
 using Core.Items;
 using Game.Pool;
 
-namespace Core.UI
+namespace Core.Invertory
 {
     public class InvertoryController : MonoBehaviour
     {
