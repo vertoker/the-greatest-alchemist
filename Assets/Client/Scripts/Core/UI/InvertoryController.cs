@@ -5,10 +5,11 @@ using UnityEngine;
 
 using Core.Items;
 using Game.Pool;
+using GameBehaviour;
 
 namespace Core.UI
 {
-    public class InvertoryController : MonoBehaviour
+    public class InvertoryController : MonoInit
     {
         private ItemSlot[] _slots;
         private RectTransform _transform;
@@ -17,23 +18,23 @@ namespace Core.UI
         private UnityAction<int, int> _switchItems;
         private UnityAction<int> _collectItem;
 
-        private void Awake()
+        public override void Init()
         {
             _transform = GetComponent<RectTransform>();
-        }
-
-        public void Init(UnityAction<int, int> switchItems, UnityAction<int> collectItem, UnityAction<int> append, UnityAction<int> start, UnityAction finish)
-        {
-            _switchItems = switchItems;
-            _collectItem = collectItem;
             _slots = new ItemSlot[_transform.childCount];
-            ItemSlot.Init(Click, append, start, finish);
+
             for (int i = 0; i < _transform.childCount; i++)
             {
                 var slot = _transform.GetChild(i).GetComponent<ItemSlot>();
                 _slots[i] = slot;
                 _slots[i].Init(i);
             }
+        }
+        public void Init(UnityAction<int, int> switchItems, UnityAction<int> collectItem, UnityAction<int> append, UnityAction<int> start, UnityAction finish)
+        {
+            _switchItems = switchItems;
+            _collectItem = collectItem;
+            ItemSlot.Init(Click, append, start, finish);
         }
 
         public void UpdateUI(InvertoryItem[] items)

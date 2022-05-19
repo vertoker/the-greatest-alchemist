@@ -56,5 +56,12 @@ namespace Core.Items
             quantity = 0;
             return true;
         }
+
+        public static bool EqualsItem(InvertoryItem item1, InvertoryItem item2)
+        {
+            if (!item1.IsEmpty() && !item2.IsEmpty())
+                return item1.Item.ID == item2.Item.ID;
+            return false;
+        }
     }
 }

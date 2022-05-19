@@ -9,26 +9,21 @@ using UnityEditor;
 using Game.Pool;
 using Core.Items;
 using Core.UI;
+using GameBehaviour;
 
 namespace Core
 {
-    public class InvertoryHolder : MonoBehaviour
+    public class InvertoryHolder : MonoInit
     {
         private int _invertoryCapacity;
         [SerializeField] private InvertoryItem[] _items;
         [SerializeField] private InvertoryController _controller;
         [SerializeField] private PoolData _dataCapacity;
-        [Space]
-        [SerializeField] private List<int> _slotsSelected = new List<int>();
-        [SerializeField] private int _slotDragQuantity;
 
-        private void Awake()
+        public override void Init()
         {
             _invertoryCapacity = _dataCapacity.GetCapacity;
             _items = new InvertoryItem[_invertoryCapacity];
-        }
-        private void Start()
-        {
             _controller.Init(Switch, Collect, AppendDrag, StartDrag, FinishDrag);
         }
 
@@ -96,9 +91,17 @@ namespace Core
         }
         public void Switch(int id1, int id2)
         {
-            InvertoryItem temp = _items[id1];
-            _items[id1] = _items[id2];
-            _items[id2] = temp;
+            if (InvertoryItem.EqualsItem(_items[id1], _items[id2]))
+            {
+                if (_items[id2].FullAdd(ref _items[id1].Quantity))
+                    _items[id1].Remove();
+            }
+            else
+            {
+                InvertoryItem temp = _items[id1];
+                _items[id1] = _items[id2];
+                _items[id2] = temp;
+            }
 
             _controller.UpdateUI(_items);
         }
@@ -137,6 +140,10 @@ namespace Core
             _controller.UpdateUI(_items);
         }
 
+        [SerializeField] private List<int> _slotsSelected = new List<int>();
+        [SerializeField] private Item _slotDragItem;
+        [SerializeField] private int _slotDragQuantity;
+        [SerializeField] private int _dragSelected;
         public void StartDrag(int id)
         {
             if (_items[id] == null)
@@ -145,30 +152,43 @@ namespace Core
                 return;
             Item initItem = _items[id].Item;
             _slotDragQuantity = _items[id].Quantity;
+            _slotDragItem = _items[id].Item;
             _slotsSelected.Add(id);
-            UpdateSlotsDrag(initItem);
+            UpdateSlotsDrag(_slotsSelected[0]);
         }
         public void AppendDrag(int id)
         {
             if (_slotsSelected.Count == 0)
                 return;
 
-            Item initItem = _items[_slotsSelected[0]].Item;
+            _slotDragItem = _items[_slotsSelected[0]].Item;
+            _dragSelected = _slotsSelected[^1];
 
             for (int i = 0; i < _slotsSelected.Count; i++)
-                if (_slotsSelected[i] == id || !_items[id].IsEmpty())// Если слот повторяется или слот не пустой
-                    return;
+            {
+                if (_slotsSelected[i] == id)// Если слот повторяется
+                {
+                    _dragSelected = id;
+                    break;
+                }
+                if (_items[id].IsEmpty())// Если слот пустой
+                {
+                    if (_slotDragQuantity == _slotsSelected.Count)//Если больше нет количества для слотов
+                        return;
+                    _slotsSelected.Add(id);
+                    break;
+                }
+            }
 
-            _slotsSelected.Add(id);
-            UpdateSlotsDrag(initItem);
+            UpdateSlotsDrag(_dragSelected);
         }
-        private void UpdateSlotsDrag(Item initItem)
+        private void UpdateSlotsDrag(int selected)
         {
             int whole = _slotDragQuantity / _slotsSelected.Count;
             int remainder = _slotDragQuantity - whole * _slotsSelected.Count;
             for (int i = 0; i < _slotsSelected.Count; i++)
-                _items[_slotsSelected[i]].Add(initItem, whole);
-            _items[_slotsSelected[^1]].Quantity += remainder;
+                _items[_slotsSelected[i]].Add(_slotDragItem, whole);
+            _items[selected].Quantity += remainder;
 
             _controller.SelectDrag(_slotsSelected);
             _controller.UpdateUI(_items);
