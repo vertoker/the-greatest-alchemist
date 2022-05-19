@@ -5,20 +5,19 @@ using UnityEngine;
 
 using Core.Items;
 using Game.Pool;
-using GameBehaviour;
 
 namespace Core.UI
 {
-    public class InvertoryController : MonoInit
+    public class InvertoryController : MonoBehaviour
     {
-        private ItemSlot[] _slots;
+        [SerializeField] private ItemSlot[] _slots;
         private RectTransform _transform;
         [SerializeField] private int _selected = -1;
 
         private UnityAction<int, int> _switchItems;
         private UnityAction<int> _collectItem;
 
-        public override void Init()
+        private void Awake()
         {
             _transform = GetComponent<RectTransform>();
             _slots = new ItemSlot[_transform.childCount];

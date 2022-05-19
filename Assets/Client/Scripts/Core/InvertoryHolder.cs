@@ -9,21 +9,23 @@ using UnityEditor;
 using Game.Pool;
 using Core.Items;
 using Core.UI;
-using GameBehaviour;
 
 namespace Core
 {
-    public class InvertoryHolder : MonoInit
+    public class InvertoryHolder : MonoBehaviour
     {
         private int _invertoryCapacity;
         [SerializeField] private InvertoryItem[] _items;
         [SerializeField] private InvertoryController _controller;
         [SerializeField] private PoolData _dataCapacity;
 
-        public override void Init()
+        private void Awake()
         {
             _invertoryCapacity = _dataCapacity.GetCapacity;
             _items = new InvertoryItem[_invertoryCapacity];
+            for (int i = 0; i < _invertoryCapacity; i++)
+                _items[i] = new InvertoryItem();
+
             _controller.Init(Switch, Collect, AppendDrag, StartDrag, FinishDrag);
         }
 
@@ -107,8 +109,6 @@ namespace Core
         }
         public void Collect(int id)
         {
-            if (_items[id] == null)
-                return;
             if (_items[id].IsEmpty())
                 return;
 
@@ -146,8 +146,6 @@ namespace Core
         [SerializeField] private int _dragSelected;
         public void StartDrag(int id)
         {
-            if (_items[id] == null)
-                return;
             if (_items[id].IsEmpty())
                 return;
             Item initItem = _items[id].Item;

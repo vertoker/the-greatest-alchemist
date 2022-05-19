@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Attributes;
+using GameBehaviour;
 
 namespace Game.Pool
 {
-    public class PoolSpawner : MonoBehaviour
+    public class PoolSpawner : MonoInit
     {
         [SerializeField] private PoolData _data;
         [SerializeField] private Queue<GameObject> pool = new Queue<GameObject>();
@@ -13,7 +14,7 @@ namespace Game.Pool
         [ShowIf(ActionOnConditionFail.Disable, ConditionOperator.And, nameof(_spawnInParent))]
         [SerializeField] private Transform parent;
 
-        private void Start()
+        public override void Init()
         {
             if (_spawnInParent)
             {
