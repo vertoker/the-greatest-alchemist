@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -7,31 +7,43 @@ using TMPro;
 
 using Core.Items;
 
-namespace Core.Invertory
+namespace Core.Craft.UI
 {
-    public class ItemSlot : MonoBehaviour
+    public class TableSlot : MonoBehaviour
     {
-        [SerializeField] private TMP_Text _capacity;
-        [SerializeField] private Image _item, _background;
+        private TMP_Text _timer;
+        private Image _item, _background;
 
-        public int ID;
+        private int _id;
+        public int ID => _id;
+        public void SetID(int id)
+        {
+            _id = id;
+        }
+
+        private void Awake()
+        {
+            _background = GetComponent<Image>();
+            _item = transform.GetChild(1).GetComponent<Image>();
+            _timer = transform.GetChild(2).GetComponent<TMP_Text>();
+        }
 
         public void UpdateItem(InvertoryItem item)
         {
             if (item == null)
             {
                 _item.sprite = null;
-                _capacity.text = string.Empty;
+                _timer.text = string.Empty;
             }
             else if (item.IsEmpty())
             {
                 _item.sprite = null;
-                _capacity.text = string.Empty;
+                _timer.text = string.Empty;
             }
             else
             {
                 _item.sprite = item.Item.Image;
-                _capacity.text = item.Quantity.ToString();
+                _timer.text = item.Quantity.ToString();
             }
         }
 

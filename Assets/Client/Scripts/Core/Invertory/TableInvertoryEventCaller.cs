@@ -1,13 +1,13 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine;
-using System;
 
 namespace Core.Invertory
 {
-    public class InvertoryEventCaller : EventCaller, IPointerDownHandler, IBeginDragHandler, IDragHandler, IPointerUpHandler
+    public class TableInvertoryEventCaller : EventCaller, IPointerDownHandler, IBeginDragHandler, IDragHandler, IPointerUpHandler
     {
         [SerializeField] private ScrollRect _scrollRect;
         private Vector2 _startPosition;
@@ -42,7 +42,6 @@ namespace Core.Invertory
                 return;
 
             _isSelect = true;
-
             _results = new List<RaycastResult>();
             _raycaster.Raycast(eventData, _results);
             if (_results.Count != 0)
@@ -56,7 +55,6 @@ namespace Core.Invertory
                     }
                 }
             }
-
             _scrollRect.enabled = false;
         }
         public void OnDrag(PointerEventData eventData)
@@ -66,8 +64,16 @@ namespace Core.Invertory
                 _results = new List<RaycastResult>();
                 _raycaster.Raycast(eventData, _results);
                 if (_results.Count != 0)
-                    if (_results[0].gameObject.TryGetComponent(out ItemSlot slot))
-                        _append.Invoke(slot.ID);
+                {
+                    foreach (var result in _results)
+                    {
+                        if (result.gameObject.TryGetComponent(out ItemSlot slot))
+                        {
+                            _append.Invoke(slot.ID);
+                            break;
+                        }
+                    }
+                }
             }
         }
         public void OnPointerUp(PointerEventData eventData)
@@ -76,12 +82,16 @@ namespace Core.Invertory
             _raycaster.Raycast(eventData, _results);
             if (_results.Count != 0)
             {
-                if (_results[0].gameObject.TryGetComponent(out ItemSlot slot))
+                foreach (var result in _results)
                 {
-                    if (_isSelect)
-                        _finish.Invoke();
-                    if (!_isDrag)
-                        _click.Invoke(slot.ID);
+                    if (result.gameObject.TryGetComponent(out ItemSlot slot))
+                    {
+                        if (_isSelect)
+                            _finish.Invoke();
+                        else if (!_isDrag)
+                            _click.Invoke(slot.ID);
+                        break;
+                    }
                 }
             }
 
@@ -91,27 +101,6 @@ namespace Core.Invertory
                 _scrollRect.enabled = true;
             }
             _isDrag = false;
-        }
-
-        private object SendRaycast(PointerEventData eventData, out Type type)
-        {
-            _results = new List<RaycastResult>();
-            _raycaster.Raycast(eventData, _results);
-
-            if (_results.Count != 0)
-            {
-                foreach (var result in _results)
-                {
-                    if (result.gameObject.TryGetComponent(out ItemSlot slot))
-                    {
-                        type = typeof(ItemSlot);
-                        return slot;
-                    }
-                }
-            }
-
-            type = typeof(object);
-            return null;
         }
     }
 }

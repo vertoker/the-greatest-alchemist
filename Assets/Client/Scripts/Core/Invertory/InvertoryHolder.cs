@@ -16,16 +16,28 @@ namespace Core.Invertory
         private int _invertoryCapacity;
         [SerializeField] private InvertoryItem[] _items;
         [SerializeField] private InvertoryController _controller;
+        [SerializeField] private InvertoryController _controllerTable;
         [SerializeField] private PoolData _dataCapacity;
 
-        private void Awake()
+        private void Start()
         {
             _invertoryCapacity = _dataCapacity.GetCapacity;
             _items = new InvertoryItem[_invertoryCapacity];
             for (int i = 0; i < _invertoryCapacity; i++)
                 _items[i] = new InvertoryItem();
 
-            _controller.Init(Switch, Collect, AppendDrag, StartDrag, FinishDrag);
+            _controller.InitEvents(Switch, Collect, AppendDrag, StartDrag, FinishDrag);
+            _controllerTable.InitEvents(Switch, Collect, AppendDrag, StartDrag, FinishDrag);
+            UpdateAll();
+        }
+
+        public void AddButtonDebug(int quantity)
+        {
+            Add(ItemsHolder.Items[0], quantity);
+        }
+        public void RemovButtonDebug(int quantity)
+        {
+            Remove(ItemsHolder.Items[0], quantity);
         }
 
         public void Add(Item item, int quantity, bool inStackable = true)
@@ -58,7 +70,7 @@ namespace Core.Invertory
                 }
             }
 
-            _controller.UpdateUI(_items);
+            UpdateAll();
         }
         public bool Remove(Item item, int quantity)
         {
@@ -87,7 +99,7 @@ namespace Core.Invertory
                     _items[allItemsID[i]].Remove();
             }
 
-            _controller.UpdateUI(_items);
+            UpdateAll();
             return true;
         }
         public void Switch(int id1, int id2)
@@ -104,7 +116,7 @@ namespace Core.Invertory
                 _items[id2] = temp;
             }
 
-            _controller.UpdateUI(_items);
+            UpdateAll();
         }
         public void Collect(int id)
         {
@@ -136,7 +148,7 @@ namespace Core.Invertory
                 }
             }
 
-            _controller.UpdateUI(_items);
+            UpdateAll();
         }
 
         [Space(30)]
@@ -189,13 +201,21 @@ namespace Core.Invertory
             _items[selected].Quantity += remainder;
 
             _controller.SelectDrag(_slotsSelected);
-            _controller.UpdateUI(_items);
+            _controllerTable.SelectDrag(_slotsSelected);
+            UpdateAll();
         }
         public void FinishDrag()
         {
             _slotsSelected = new List<int>();
             _controller.DeselectAll();
+            _controllerTable.DeselectAll();
+            UpdateAll();
+        }
+
+        public void UpdateAll()
+        {
             _controller.UpdateUI(_items);
+            _controllerTable.UpdateUI(_items);
         }
     }
     
