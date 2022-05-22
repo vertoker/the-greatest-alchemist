@@ -7,10 +7,11 @@ using UnityEngine;
 
 namespace Core.Invertory
 {
-    public class TableInvertoryEventCaller : EventCaller, IPointerDownHandler, IBeginDragHandler, IDragHandler, IPointerUpHandler
+    public class TableInvertoryEventCaller : EventCaller, IPointerDownHandler, IBeginDragHandler, IDragHandler, IPointerUpHandler, IPointerExitHandler
     {
         [SerializeField] private ScrollRect _scrollRect;
         private Vector2 _startPosition;
+        private bool _isDown = false;
         private bool _isSelect = false;
         private bool _isDrag = false;
 
@@ -32,6 +33,7 @@ namespace Core.Invertory
         }
         public void OnPointerDown(PointerEventData eventData)
         {
+            _isDown = true;
             _startPosition = eventData.pointerCurrentRaycast.screenPosition;
         }
         public void OnBeginDrag(PointerEventData eventData)
@@ -76,8 +78,28 @@ namespace Core.Invertory
                 }
             }
         }
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (!_isDown)
+                return;
+            Debug.Log("OnPointerExit");
+
+            if (_isSelect)
+            {
+                if (_isDrag)
+                    _finish.Invoke();
+                _isSelect = false;
+                _scrollRect.enabled = true;
+            }
+            _isDrag = false;
+            _isDown = false;
+        }
         public void OnPointerUp(PointerEventData eventData)
         {
+            if (!_isDown)
+                return;
+            Debug.Log("OnPointerUp");
+
             _results = new List<RaycastResult>();
             _raycaster.Raycast(eventData, _results);
             if (_results.Count != 0)
@@ -101,6 +123,7 @@ namespace Core.Invertory
                 _scrollRect.enabled = true;
             }
             _isDrag = false;
+            _isDown = false;
         }
     }
 }

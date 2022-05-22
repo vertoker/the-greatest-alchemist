@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfde8eb34eed77643bed0b7646579fcb, type: 3}
   m_Name: SlotPool
   m_EditorClassIdentifier: 
-  _object: {fileID: 5904384112379526881, guid: ed3c3f07729e46c4295a819fe6dbfdf2, type: 3}
+  _object: {fileID: 5904384112379526881, guid: 8fa163d5d13318345bea90ac2e42222e, type: 3}
   _startCapacity: 100

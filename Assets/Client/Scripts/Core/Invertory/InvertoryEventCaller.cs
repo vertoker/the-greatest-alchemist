@@ -7,12 +7,13 @@ using System;
 
 namespace Core.Invertory
 {
-    public class InvertoryEventCaller : EventCaller, IPointerDownHandler, IBeginDragHandler, IDragHandler, IPointerUpHandler
+    public class InvertoryEventCaller : EventCaller, IPointerDownHandler, IBeginDragHandler, IDragHandler, IPointerUpHandler, IPointerExitHandler
     {
         [SerializeField] private ScrollRect _scrollRect;
         private Vector2 _startPosition;
         private bool _isSelect = false;
         private bool _isDrag = false;
+        private bool _isDown = false;
 
         [SerializeField] private InvertoryHolder _holder;
         [SerializeField] private GraphicRaycaster _raycaster;
@@ -32,6 +33,7 @@ namespace Core.Invertory
         }
         public void OnPointerDown(PointerEventData eventData)
         {
+            _isDown = true;
             _startPosition = eventData.pointerCurrentRaycast.screenPosition;
         }
         public void OnBeginDrag(PointerEventData eventData)
@@ -70,8 +72,28 @@ namespace Core.Invertory
                         _append.Invoke(slot.ID);
             }
         }
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (!_isDown)
+                return;
+            Debug.Log("OnPointerExit");
+
+            if (_isSelect)
+            {
+                if (_isDrag)
+                    _finish.Invoke();
+                _isSelect = false;
+                _scrollRect.enabled = true;
+            }
+            _isDrag = false;
+            _isDown = false;
+        }
         public void OnPointerUp(PointerEventData eventData)
         {
+            if (!_isDown)
+                return;
+            Debug.Log("OnPointerUp");
+
             _results = new List<RaycastResult>();
             _raycaster.Raycast(eventData, _results);
             if (_results.Count != 0)
@@ -91,27 +113,7 @@ namespace Core.Invertory
                 _scrollRect.enabled = true;
             }
             _isDrag = false;
-        }
-
-        private object SendRaycast(PointerEventData eventData, out Type type)
-        {
-            _results = new List<RaycastResult>();
-            _raycaster.Raycast(eventData, _results);
-
-            if (_results.Count != 0)
-            {
-                foreach (var result in _results)
-                {
-                    if (result.gameObject.TryGetComponent(out ItemSlot slot))
-                    {
-                        type = typeof(ItemSlot);
-                        return slot;
-                    }
-                }
-            }
-
-            type = typeof(object);
-            return null;
+            _isDown = false;
         }
     }
 }
